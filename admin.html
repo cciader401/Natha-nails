@@ -106,7 +106,7 @@
     </div>
 
     <script>
-        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbyJCBZw_fc97EXhZzfe0NdBYcDfzMxkV1uEYxwxh-ks0dBWH132WZt3ygCAKKlqgrix/exec";
+        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzxTjFZj1DrSA4sZhX6ZshkHJXo-ZFwTgO2Doe6lDMJllPVknrDogAS2Gj29RAaAIRP/exec";
 
         function formatearFechaEspanol(fechaStr) {
             try {
@@ -141,7 +141,7 @@
                 tbody.innerHTML = "";
 
                 if (!data || data.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-gray-500">No hay turnos registrados.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-gray-500">No hay turnos registrados en la planilla.</td></tr>`;
                     return;
                 }
 
@@ -182,7 +182,7 @@
 
             } catch (error) {
                 console.error(error);
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-red-500">Error al conectar con Google Sheets. Comprobá la URL del Script.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-red-500">Error al conectar con Google Sheets. Comprobá que la implementación sea pública ("Cualquier usuario").</td></tr>`;
             }
         }
 
