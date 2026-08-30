@@ -170,7 +170,7 @@
 </div>
 
 <script>
-    const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzxTjFZj1DrSA4sZhX6ZshkHJXo-ZFwTgO2Doe6lDMJllPVknrDogAS2Gj29RAaAIRP/exec";
+    const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbwUMbo1NlDlGbRSLUDhoPADCRNZazpmEw1SutJfH1ecWoHLvMEuFMy5ruKCePijZAkG/exec";
 
     function actualizarHorariosDisponibles() {
         const fechaInput = document.getElementById('fechaDia').value;
@@ -245,14 +245,7 @@
             btn.disabled = false;
             btn.innerText = "Confirmar Reserva";
             msg.style.color = "green";
-
-            const avisoMiWp = `¡Hola Natha! Tenés un nuevo turno reservado:\n\n👤 Cliente: ${cliente}\n📱 Teléfono: ${telefono}\n💅 Servicio: ${servicio}\n📅 Fecha y Hora: ${fechaTurnoStr}`;
-            const linkMiWp = `https://wa.me/5491123705713?text=${encodeURIComponent(avisoMiWp)}`;
-
-            msg.innerHTML = `¡Turno reservado con éxito! 🎉<br><br>
-                <a href="${linkMiWp}" target="_blank" style="background:#25d366; color:white; padding:8px 12px; border-radius:5px; text-decoration:none; font-size:0.85rem; display:inline-block; font-weight:bold;">
-                    <i class="fa-brands fa-whatsapp"></i> Toca acá para recibir tu aviso en WhatsApp
-                </a>`;
+            msg.innerText = "¡Turno reservado con éxito! 🎉 (Te avisamos por Telegram)";
 
             document.getElementById('formTurno').reset();
             document.getElementById('horaTurno').innerHTML = '<option value="">Primero elegí una fecha...</option>';
