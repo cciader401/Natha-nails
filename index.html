@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reserva de Turnos - Estética Natha</title>
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Importación de la fuente Brittany -->
     <link href="https://fonts.googleapis.com/css2?family=Brittany+Signature&display=swap" rel="stylesheet">
     <style>
@@ -114,7 +116,7 @@
         <img src="https://t4.ftcdn.net/jpg/05/65/93/79/360_F_565937969_YRyFHd7tWx7s35LDVCzn6rkKgCBS761n.jpg" alt="Estética Natha Banner">
         <div class="banner-overlay">
             <h1 class="neon-title">Nahta Nails</h1>
-            <span class="neon-subtitle">by Ceci López</span>
+            <span class="neon-subtitle">voy Ceci López</span>
         </div>
     </div>
 
@@ -122,9 +124,9 @@
         <h2>Reservar Turno ✨</h2>
         
         <div class="info-horarios">
-            <strong>Dias y horarios:</strong><br>
-            • Lun a Vie: 09:00 hs a 19:00 hs<br>
-            • Sábados: 09:00 hs a 12:00 hs
+            <strong>Horarios fijos (bloques de 1 hora):</strong><br>
+            • Lun a Vie: 09:00 a 19:00 hs<br>
+            • Sábados: 09:00 a 12:00 hs (Domingos cerrado)
         </div>
 
         <form id="formTurno" onsubmit="enviarTurno(event)">
@@ -168,7 +170,7 @@
 </div>
 
 <script>
-    const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbyJCBZw_fc97EXhZzfe0NdBYcDfzMxkV1uEYxwxh-ks0dBWH132WZt3ygCAKKlqgrix/exec";
+    const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzxTjFZj1DrSA4sZhX6ZshkHJXo-ZFwTgO2Doe6lDMJllPVknrDogAS2Gj29RAaAIRP/exec";
 
     function actualizarHorariosDisponibles() {
         const fechaInput = document.getElementById('fechaDia').value;
@@ -216,6 +218,9 @@
             return;
         }
 
+        const cliente = document.getElementById('cliente').value;
+        const telefono = document.getElementById('telefono').value;
+        const servicio = document.getElementById('servicio').value;
         const fechaTurnoStr = `${fechaDia}T${horaSeleccionada}:00`;
 
         btn.disabled = true;
@@ -224,9 +229,9 @@
         msg.innerText = "Procesando turno...";
 
         const datos = {
-            cliente: document.getElementById('cliente').value,
-            telefono: document.getElementById('telefono').value,
-            servicio: document.getElementById('servicio').value,
+            cliente: cliente,
+            telefono: telefono,
+            servicio: servicio,
             fechaTurno: fechaTurnoStr
         };
 
@@ -240,7 +245,15 @@
             btn.disabled = false;
             btn.innerText = "Confirmar Reserva";
             msg.style.color = "green";
-            msg.innerText = "¡Turno reservado con éxito!";
+
+            const avisoMiWp = `¡Hola Natha! Tenés un nuevo turno reservado:\n\n👤 Cliente: ${cliente}\n📱 Teléfono: ${telefono}\n💅 Servicio: ${servicio}\n📅 Fecha y Hora: ${fechaTurnoStr}`;
+            const linkMiWp = `https://wa.me/5491123705713?text=${encodeURIComponent(avisoMiWp)}`;
+
+            msg.innerHTML = `¡Turno reservado con éxito! 🎉<br><br>
+                <a href="${linkMiWp}" target="_blank" style="background:#25d366; color:white; padding:8px 12px; border-radius:5px; text-decoration:none; font-size:0.85rem; display:inline-block; font-weight:bold;">
+                    <i class="fa-brands fa-whatsapp"></i> Toca acá para recibir tu aviso en WhatsApp
+                </a>`;
+
             document.getElementById('formTurno').reset();
             document.getElementById('horaTurno').innerHTML = '<option value="">Primero elegí una fecha...</option>';
         })
