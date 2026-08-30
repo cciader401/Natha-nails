@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Turnos Natha ✨</title>
+    <!-- Tailwind CSS CDN para estilos rápidos y responsivos -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SheetJS para exportar a Excel (si se usa) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen p-4 sm:p-6">
+
+    <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6">
+        <!-- Encabezado -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-4 mb-6 gap-4">
+            <h1 class="text-xl sm:text-2xl font-bold text-pink-600 flex items-center gap-2">
+                Panel de Administración - Turnos Natha ✨
+            </h1>
+            <div class="flex gap-2 w-full sm:w-auto">
+                <button onclick="exportarPDF()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 flex-1 sm:flex-none">
+                    <i class="fa-solid fa-file-pdf"></i> Descargar en PDF
+                </button>
+                <button onclick="cargarTurnos()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 flex-1 sm:flex-none">
+                    <i class="fa-solid fa-sync"></i> Actualizar
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabla de Turnos -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-pink-50 text-pink-700 uppercase text-xs tracking-wider border-b border-pink-100">
+                        <th class="py-3 px-4">Cliente</th>
+                        <th class="py-3 px-4">Teléfono</th>
+                        <th class="py-3 px-4">Servicio</th>
+                        <th class="py-3 px-4">Fecha del Turno</th>
+                        <th class="py-3 px-4 text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-turnos" class="divide-y divide-gray-100 text-sm text-gray-700">
+                    <!-- Los turnos se cargan dinámicamente con JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbxOfaGfcvekx2HNnNiEw88fPEKvx7YODmb52_jBsXP8lLCuMTgt-DiPlaFVmaVHZkIo/exec";
+
+        // Función corregida sin año y sin segundos (ej: "lunes 31 de agosto 9:00hs")
+        function formatearFechaEspanol(fechaStr) {
+            try {
+                const fecha = new Date(fechaStr);
+                if (isNaN(fecha.getTime())) return fechaStr;
+
+                // Opciones excluyendo explícitamente el año ('year')
+                const opcionesDía = { 
+                    weekday: 'long', 
+                    day: 'numeric', 
+                    month: 'long', 
+                    timeZone: 'America/Argentina/Buenos_Aires' 
+                };
+                
+                let fechaFormateada = fecha.toLocaleDateString('es-ES', opcionesDía);
+                
+                // Extraer únicamente horas y minutos sin segundos
+                const horas = fecha.getHours();
+                const minutos = String(fecha.getMinutes()).padStart(2, '0');
+
+                return `${fechaFormateada} ${horas}:${minutos}hs`;
+            } catch (e) {
+                return fechaStr;
+            }
+        }
+
+        async function cargarTurnos() {
+            const tbody = document.getElementById('tabla-turnos');
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Cargando turnos...</td></tr>`;
+
+            try {
+                const response = await fetch(URL_SCRIPT);
+                const data = await response.json();
+
+                tbody.innerHTML = "";
+
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-gray-500">No hay turnos registrados.</td></tr>`;
+                    return;
+                }
+
+                data.forEach((turno, index) => {
+                    const cliente = turno.cliente || turno.Cliente || "Sin nombre";
+                    const telefono = turno.telefono || turno.Teléfono || "-";
+                    const servicio = turno.servicio || turno.Servicio || "-";
+                    const fechaBruta = turno.fechaTurno || turno.Fecha || turno.fecha || "";
+
+                    const fechaBonita = formatearFechaEspanol(fechaBruta);
+                    
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-gray-50 transition-colors";
+                    tr.innerHTML = `
+                        <td class="py-3 px-4 font-medium text-gray-900">${cliente}</td>
+                        <td class="py-3 px-4">${telefono}</td>
+                        <td class="py-3 px-4">${servicio}</td>
+                        <td class="py-3 px-4 font-semibold text-pink-600">${fechaBonita}</td>
+                        <td class="py-3 px-4 text-center">
+                            <button onclick="eliminarTurno(${index})" class="text-red-500 hover:text-red-700 p-1" title="Eliminar turno">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+            } catch (error) {
+                console.error(error);
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-red-500">Error al conectar con Google Sheets. Comprobá la URL del Script.</td></tr>`;
+            }
+        }
+
+        function exportarPDF() {
+            window.print();
+        }
+
+        function eliminarTurno(index) {
+            if(confirm("¿Estás segura de eliminar este turno?")) {
+                alert("Para eliminar desde Google Sheets de forma permanente, asegurate de tener la función de borrado configurada en tu Apps Script.");
+                cargarTurnos();
+            }
+        }
+
+        window.onload = cargarTurnos;
+    </script>
+</body>
+</html>
